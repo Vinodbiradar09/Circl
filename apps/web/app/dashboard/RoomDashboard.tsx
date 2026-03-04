@@ -2,7 +2,7 @@
 
 import { signOut } from "@repo/auth/client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import type { AuthSession } from "@repo/auth";
 
 interface Props {
@@ -18,10 +18,17 @@ export default function DashboardClient({ session, initialUsers }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const handleSignOut = async () => {
+    console.log("woe");
     await signOut();
     router.push("/login");
     router.refresh();
   };
+
+  const handleLogout = useCallback(async () => {
+    console.log("i a");
+    // setLoggingOut(true);
+    await signOut({ fetchOptions: { onSuccess: () => router.push("/login") } });
+  }, [router]);
 
   const fetchUsers = () => {
     startTransition(async () => {

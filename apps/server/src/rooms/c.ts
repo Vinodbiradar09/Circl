@@ -106,6 +106,7 @@ const Rooms = {
   },
 
   async createRoom(req: Request, res: Response) {
+    console.log(" i a, coming");
     try {
       if (!req.user || !req.user.id) {
         return res.status(401).json({
@@ -113,6 +114,7 @@ const Rooms = {
           success: false,
         });
       }
+      console.log("uff", req.body);
       const { success, data } = createRoomSchema.safeParse(req.body);
       if (!success) {
         return res.status(403).json({
@@ -143,6 +145,7 @@ const Rooms = {
             memberCount: 1,
             lat,
             lng,
+            img: data.img,
           },
         });
         await tx.roomMember.create({
@@ -176,7 +179,7 @@ const Rooms = {
       console.log("error", error);
       if (error instanceof AppError) {
         return res.status(error.status).json({
-          message: error.message,
+          message: error.message + "hello",
           success: false,
         });
       }
@@ -223,6 +226,7 @@ const Rooms = {
           409,
         );
       }
+      console.log("rommror", data.roomId);
       const { member, room } = await prisma.$transaction(async (tx) => {
         // lock room row for preventing the race conditions for member count
         const rows = await tx.$queryRaw<
@@ -251,6 +255,7 @@ const Rooms = {
             FOR UPDATE
           `;
         const room = rows[0];
+        console.log("heyeyye", room);
         if (!room) throw new AppError("room not found", 404);
         if (room.isBlacklisted) throw new AppError("room is blacklisted", 403);
         if (room.isDeleted) throw new AppError("room not found", 404);

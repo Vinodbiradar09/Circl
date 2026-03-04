@@ -80,9 +80,6 @@ export class RoomManager {
       case "BROADCAST":
         this.sendMessagesToWsRooms(ws, data);
         break;
-      case "ROOMSNEARME":
-        this.roomsNearMe(ws, data);
-        break;
     }
   }
 
@@ -177,8 +174,6 @@ export class RoomManager {
       },
     ]).catch((err) => console.log("error in pushing messages to kafka", err));
   }
-
-  private async roomsNearMe(ws: AuthenticatedWebSocket, data: any) {}
   // on close connection remove the socket , check for the last if there is zero sockets then unsubscribe to this roomId
   private onClose(ws: AuthenticatedWebSocket) {
     for (const [roomId, sockets] of this.rooms.entries()) {

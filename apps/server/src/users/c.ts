@@ -191,7 +191,7 @@ const Users = {
       const { success, data } = reportUser.safeParse(req.body);
       if (!success) {
         return res.status(400).json({
-          message: "user id required",
+          message: "reason required",
           success: false,
         });
       }

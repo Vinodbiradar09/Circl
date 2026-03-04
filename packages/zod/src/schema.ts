@@ -3,9 +3,9 @@ import geohash from "ngeohash";
 
 const createRoomSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  img: z.instanceof(File).optional(),
-  lat: z.string(),
-  lng: z.string(),
+  img: z.string().optional(),
+  lat: z.number(),
+  lng: z.number(),
 });
 
 const joinRoomSchema = z.object({
@@ -48,12 +48,12 @@ const editMessageSchema = z.object({
 });
 
 const blacklistRoomSchema = z.object({
-  reason : z.string(),
-})
+  reason: z.string(),
+});
 
 const reportUser = z.object({
-  reason : z.string(),
-})
+  reason: z.string(),
+});
 
 // will setup the geoHash here
 export const GEO_PRECISION = 5;
@@ -102,5 +102,5 @@ export {
   editMessageSchema,
   removeMembersSchema,
   blacklistRoomSchema,
-  reportUser
+  reportUser,
 };

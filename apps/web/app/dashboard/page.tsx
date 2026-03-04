@@ -1,7 +1,7 @@
 import { auth } from "@repo/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import DashboardClient from "./DashboardClient";
+import DashboardClient from "./RoomDashboard";
 
 export default async function DashboardPage() {
   // auth check and validation with db

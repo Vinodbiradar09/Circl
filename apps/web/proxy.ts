@@ -9,7 +9,7 @@ export default function proxy(request: NextRequest) {
     (pathname === "/login" || pathname === "/signup" || pathname === "/")
   ) {
     console.log("i am hitting this");
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/rooms", request.url));
   }
   const isPublic =
     pathname === "/" ||
@@ -36,7 +36,7 @@ export default function proxy(request: NextRequest) {
     (pathname === "/login" || pathname === "/signup" || pathname === "/")
   ) {
     console.log("i am hitting this");
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/rooms", request.url));
   }
   return NextResponse.next();
 }

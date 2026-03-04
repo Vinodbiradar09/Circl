@@ -11,7 +11,7 @@ export default function Login() {
   const handleSignIn = async (provider: "google" | "github") => {
     setIsLoading(provider);
     try {
-      await signIn.social({ provider, callbackURL: "/dashboard" });
+      await signIn.social({ provider, callbackURL: "/rooms" });
     } catch (error) {
       console.error(`Error in ${provider} signin`, error);
     } finally {
