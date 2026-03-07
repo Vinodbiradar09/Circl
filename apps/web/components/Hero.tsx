@@ -2,174 +2,303 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 28 },
+  initial: { opacity: 0, y: 18 },
   animate: { opacity: 1, y: 0 },
-  transition: {
-    duration: 0.9,
-    delay,
-    ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
-  },
+  transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] as const },
 });
 
-const userDots = [
+const NODES = [
   {
-    label: "A",
-    tag: "Art talk nearby",
-    color: "#6B8F71",
-    top: "12%",
-    left: "55%",
-    anim: "float",
+    id: "a",
+    orbit: 150,
+    speed: 22,
+    startDeg: 40,
+    dir: 1,
+    size: 44,
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="rgba(255,255,255,0.55)"
+        strokeWidth="1.5"
+        width="18"
+        height="18"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
   },
   {
-    label: "M",
-    tag: "Coffee run?",
-    color: "#A07855",
-    top: "60%",
-    left: "15%",
-    anim: "float-delay-1",
+    id: "b",
+    orbit: 150,
+    speed: 22,
+    startDeg: 210,
+    dir: 1,
+    size: 44,
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="rgba(255,255,255,0.55)"
+        strokeWidth="1.5"
+        width="18"
+        height="18"
+      >
+        <circle cx="12" cy="10" r="3" />
+        <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 0 0-8-8z" />
+      </svg>
+    ),
   },
   {
-    label: "J",
-    tag: "2.1 km away",
-    color: "#4A6350",
-    top: "70%",
-    left: "65%",
-    anim: "float-delay-2",
+    id: "c",
+    orbit: 100,
+    speed: 30,
+    startDeg: 110,
+    dir: -1,
+    size: 38,
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="rgba(255,255,255,0.55)"
+        strokeWidth="1.5"
+        width="16"
+        height="16"
+      >
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+        <line x1="6" y1="1" x2="6" y2="4" />
+        <line x1="10" y1="1" x2="10" y2="4" />
+        <line x1="14" y1="1" x2="14" y2="4" />
+      </svg>
+    ),
   },
   {
-    label: "R",
-    tag: "Music room",
-    color: "#8B6E52",
-    top: "20%",
-    left: "18%",
-    anim: "float-delay-3",
+    id: "d",
+    orbit: 100,
+    speed: 30,
+    startDeg: 290,
+    dir: -1,
+    size: 38,
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="rgba(255,255,255,0.55)"
+        strokeWidth="1.5"
+        width="16"
+        height="16"
+      >
+        <path d="M9 18V5l12-2v13" />
+        <circle cx="6" cy="18" r="3" />
+        <circle cx="18" cy="16" r="3" />
+      </svg>
+    ),
   },
-];
+] as const;
 
 export default function Hero() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const angles = useRef<number[]>(
+    NODES.map((n) => (n.startDeg * Math.PI) / 180),
+  );
+  const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const rafId = useRef<number>(0);
+
+  useEffect(() => {
+    let prev = performance.now();
+    const loop = (now: number) => {
+      const dt = Math.min((now - prev) / 1000, 0.05);
+      prev = now;
+      const wrap = wrapRef.current;
+      if (wrap) {
+        const cx = wrap.offsetWidth / 2;
+        const cy = wrap.offsetHeight / 2;
+        NODES.forEach((n, i) => {
+          angles.current[i]! += ((2 * Math.PI) / n.speed) * dt * n.dir;
+          const el = dotRefs.current[i];
+          if (!el) return;
+          const x = cx + n.orbit * Math.cos(angles.current[i]!);
+          const y = cy + n.orbit * Math.sin(angles.current[i]!);
+          el.style.left = `${x}px`;
+          el.style.top = `${y}px`;
+          el.style.transform = "translate(-50%,-50%)";
+        });
+      }
+      rafId.current = requestAnimationFrame(loop);
+    };
+    rafId.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId.current);
+  }, []);
+
   return (
-    <section className="min-h-screen grid grid-cols-1 md:grid-cols-2 items-center px-14 pt-30 pb-20 relative overflow-hidden">
-      <div className="absolute -right-25 top-1/2 -translate-y-1/2 w-180 h-180 bg-gradient-radial from-warm via-sand to-transparent animate-morph z-0 opacity-80" />
+    <section
+      className="relative min-h-screen overflow-hidden flex items-center"
+      style={{ background: "#080808", fontFamily: "var(--font-sans)" }}
+    >
+      <div className="relative z-10 w-full grid grid-cols-1 md:grid-cols-2 items-center px-10 md:px-16 pt-32 pb-24 gap-16">
+        <div className="max-w-140">
+          <motion.div {...fadeUp(0.1)}>
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 mb-10 border"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                borderColor: "rgba(255,255,255,0.08)",
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6C63FF] animate-pulse" />
+              <span
+                className="text-[11px] tracking-[0.12em] uppercase"
+                style={{ color: "rgba(255,255,255,0.38)" }}
+              >
+                5 km radius · Live now
+              </span>
+            </div>
+          </motion.div>
 
-      <div className="relative z-10">
+          <motion.h1
+            {...fadeUp(0.18)}
+            className="mb-7 leading-[1.05]"
+            style={{
+              fontSize: "clamp(52px,6.5vw,88px)",
+              fontWeight: 500,
+              letterSpacing: "-0.035em",
+              fontFamily: "var(--font-display)",
+            }}
+          >
+            <span style={{ color: "rgba(255,255,255,0.28)" }}>The </span>
+            <span style={{ color: "#ffffff" }}>people</span>
+            <br />
+            <span style={{ color: "rgba(255,255,255,0.28)" }}>outside </span>
+            <span style={{ color: "#ffffff" }}>your</span>
+            <br />
+            <span style={{ color: "#ffffff" }}>window.</span>
+          </motion.h1>
+
+          <motion.p
+            {...fadeUp(0.3)}
+            className="text-[15px] leading-[1.8] mb-11 max-w-100"
+            style={{ color: "rgba(255,255,255,0.32)", fontWeight: 400 }}
+          >
+            Circl surfaces real conversations from people within 5 km. no
+            profiles, no followers, no history. Just your neighbourhood live.
+          </motion.p>
+
+          <motion.div {...fadeUp(0.44)} className="flex items-center gap-4">
+            <Link
+              href="/login"
+              className="rounded-full text-[14px] font-medium no-underline transition-all duration-250 hover:-translate-y-px"
+              style={{
+                background: "#6C63FF",
+                color: "#ffffff",
+                padding: "13px 34px",
+                letterSpacing: "-0.01em",
+                boxShadow: "0 0 36px rgba(108,99,255,0.32)",
+              }}
+            >
+              Enter your radius
+            </Link>
+            <Link
+              href="#how"
+              className="flex items-center gap-1.5 text-[13px] no-underline transition-all duration-250 group"
+              style={{
+                color: "rgba(255,255,255,0.32)",
+                letterSpacing: "-0.01em",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.color = "rgba(255,255,255,0.70)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "rgba(255,255,255,0.32)")
+              }
+            >
+              See how it works
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                className="w-3.5 h-3.5 transition-transform duration-250 group-hover:translate-x-0.5"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
+
         <motion.div
-          {...fadeUp(0.2)}
-          className="inline-flex items-center gap-2.5 text-[11px] tracking-[0.18em] uppercase text-clay mb-9 before:content-[''] before:block before:w-8 before:h-px before:bg-clay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.1, delay: 0.5 }}
+          className="hidden md:flex justify-center items-center"
         >
-          Your world within reach
-        </motion.div>
-
-        <motion.div {...fadeUp(0.25)} className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-clay/10 border border-clay/25 rounded-full py-1.5 pr-3.5 pl-2 text-[12px] text-clay tracking-[0.04em]">
-            <div className="w-5 h-5 bg-clay rounded-full flex items-center justify-center animate-pulse_clay">
+          <div ref={wrapRef} className="relative w-100 h-100">
+            {[150, 100].map((r) => (
+              <div
+                key={r}
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  border: "1px dashed rgba(255,255,255,0.07)",
+                  width: r * 2,
+                  height: r * 2,
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%,-50%)",
+                }}
+              />
+            ))}
+            {NODES.map((n, i) => (
+              <div
+                key={n.id}
+                ref={(el) => {
+                  dotRefs.current[i] = el;
+                }}
+                className="absolute will-change-transform pointer-events-none"
+                style={{ top: 0, left: 0 }}
+              >
+                <div
+                  className="rounded-full flex items-center justify-center"
+                  style={{
+                    width: n.size,
+                    height: n.size,
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.09)",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  {n.icon}
+                </div>
+              </div>
+            ))}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full flex items-center justify-center"
+              style={{
+                width: 68,
+                height: 68,
+                background: "#6C63FF",
+                boxShadow:
+                  "0 0 0 12px rgba(108,99,255,0.10), 0 0 0 26px rgba(108,99,255,0.05), 0 0 56px rgba(108,99,255,0.30)",
+              }}
+            >
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="white"
-                strokeWidth="2.5"
-                className="w-2.5 h-2.5"
+                strokeWidth="1.5"
+                width="22"
+                height="22"
               >
-                <circle cx="12" cy="12" r="5" />
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                <path d="M2 12h20" />
               </svg>
             </div>
-            5 km radius · Real people · Real moments
           </div>
         </motion.div>
-
-        <motion.h1
-          {...fadeUp(0.35)}
-          className="font-cormorant text-[clamp(60px,7vw,96px)] font-light leading-[1.05] text-moss mb-8"
-        >
-          Meet the
-          <br />
-          <em className="not-italic text-clay">world just</em>
-          <br />
-          around you
-        </motion.h1>
-        <motion.p
-          {...fadeUp(0.5)}
-          className="text-[17px] leading-[1.75] text-sage max-w-110 mb-13"
-        >
-          Circl connects you with the people living, breathing, and existing
-          within your 5 km radius. Join local rooms, spark conversations, and
-          discover a community that&apos;s always been right beside you.
-        </motion.p>
-
-        <motion.div {...fadeUp(0.65)} className="flex items-center gap-7">
-          <Link
-            href="/login"
-            className="bg-moss text-cream px-10 py-4.25 rounded-full font-dm text-[15px] font-normal tracking-[0.04em] no-underline shadow-[0_8px_32px_rgba(46,59,47,0.22)] transition-all duration-300 hover:-translate-y-0.75 hover:shadow-[0_16px_48px_rgba(46,59,47,0.3)] hover:bg-sage"
-          >
-            Get Started
-          </Link>
-          <Link
-            href="#how"
-            className="text-sage text-[14px] tracking-[0.05em] flex items-center gap-2 no-underline transition-all duration-300 hover:text-moss hover:gap-3.5 group"
-          >
-            See how it works
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              className="w-4.5 h-4.5 transition-transform duration-300 group-hover:translate-x-1"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </motion.div>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.7 }}
-        className="hidden md:flex justify-center items-center relative z-10"
-      >
-        <div className="relative w-100 h-100">
-          <div className="absolute inset-0 rounded-full border border-sand animate-ripple" />
-          <div className="absolute inset-[15%] rounded-full border border-sand animate-ripple-delay-1" />
-          <div className="absolute inset-[30%] rounded-full border border-sand animate-ripple-delay-2" />
-
-          {userDots.map((dot, i) => (
-            <div
-              key={i}
-              className={`absolute flex flex-col items-center gap-1.5 animate-${dot.anim}`}
-              style={{ top: dot.top, left: dot.left }}
-            >
-              <div
-                className="w-11 h-11 rounded-full border-[2.5px] border-white shadow-[0_4px_20px_rgba(0,0,0,0.12)] flex items-center justify-center font-cormorant text-[18px] text-white font-semibold"
-                style={{ background: dot.color }}
-              >
-                {dot.label}
-              </div>
-              <div className="bg-white rounded-full px-2.5 py-1 text-[11px] text-sage shadow-[0_2px_12px_rgba(0,0,0,0.08)] whitespace-nowrap">
-                {dot.tag}
-              </div>
-            </div>
-          ))}
-
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-moss rounded-full flex items-center justify-center shadow-[0_0_0_12px_rgba(46,59,47,0.08),0_0_0_24px_rgba(46,59,47,0.04)]">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#F7F3EE"
-              strokeWidth="1.8"
-              className="w-7 h-7"
-            >
-              <circle cx="12" cy="12" r="3" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              <path d="M2 12h20" />
-            </svg>
-          </div>
-        </div>
-      </motion.div>
-
-      <div className="hidden md:flex absolute bottom-12 left-14 items-center gap-3 text-[11px] tracking-[0.12em] uppercase text-sand opacity-0 animate-fadeIn-slow">
-        <div className="w-px h-12 bg-linear-to-b from-sand to-transparent animate-scrollLine" />
-        Explore
       </div>
     </section>
   );

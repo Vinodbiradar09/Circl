@@ -1,90 +1,159 @@
 "use client";
-
 import { useReveal } from "@/hooks/useReveal";
 
 const testimonials = [
   {
-    text: '"I met my current best friend in a Circl room about vintage bookshops. She lives literally three streets away. We\'d never spoken before."',
-    name: "Sana K.",
+    text: "I met my current best friend in a Circl room about vintage bookshops. She lives three streets away. We'd never spoken before.",
+    name: "Shambavi A.",
     loc: "Bengaluru, India",
     initial: "S",
-    color: "#6B8F71",
+    g1: "#9B8EC4",
+    g2: "#6C63FF",
   },
   {
-    text: "\"There's something beautiful about knowing the people you're talking to are right here. It makes every conversation feel warmer.\"",
+    text: "There's something grounding about knowing the people you're talking to are actually here. Every message feels like it matters.",
     name: "Daniel M.",
     loc: "Nairobi, Kenya",
     initial: "D",
-    color: "#A07855",
+    g1: "#C4936E",
+    g2: "#A0704A",
   },
   {
-    text: '"I moved to a new city and Circl made it feel like home within a week. I found my running group, my coffee spot, and my people."',
-    name: "Léa V.",
+    text: "I moved to a new city and Circl made it feel like home within a week. Found my running group, my coffee spot, and my people.",
+    name: "Lea V.",
     loc: "Lyon, France",
     initial: "L",
-    color: "#4A6350",
+    g1: "#6E9DC4",
+    g2: "#4A7FA8",
   },
 ];
 
 export default function Testimonials() {
   const { ref, visible } = useReveal();
-
   return (
-    <section id="stories" className="px-14 py-30 relative overflow-hidden">
-      <div className="absolute top-15 right-20 font-cormorant text-[320px] text-warm leading-none pointer-events-none select-none">
-        &ldquo;
-      </div>
-
+    <section
+      id="stories"
+      className="relative px-10 md:px-16 py-28"
+      style={{
+        background: "#080808",
+        borderTop: "1px solid rgba(255,255,255,0.05)",
+      }}
+    >
       <div
         ref={ref}
-        className={`relative z-10 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+        className={`transition-all duration-700 mb-16 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
       >
-        <div className="inline-flex items-center gap-2.5 text-[11px] tracking-[0.18em] uppercase text-clay mb-5 before:content-[''] before:block before:w-6 before:h-px before:bg-clay">
-          Real stories
+        <div
+          className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 mb-7 border"
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            borderColor: "rgba(255,255,255,0.08)",
+          }}
+        >
+          <span
+            className="text-[10px] uppercase tracking-[0.16em]"
+            style={{ color: "rgba(255,255,255,0.30)" }}
+          >
+            Real stories
+          </span>
         </div>
-        <h2 className="font-cormorant text-[clamp(40px,5vw,68px)] font-light leading-[1.1] text-moss mb-20 max-w-150">
-          Words from the <em className="not-italic text-clay">neighbourhood</em>
+        <h2
+          className="leading-[1.06]"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(36px,4.5vw,58px)",
+            fontWeight: 600,
+            letterSpacing: "-0.03em",
+          }}
+        >
+          <span style={{ color: "rgba(255,255,255,0.28)" }}>Words </span>
+          <span style={{ color: "#ffffff" }}>from the</span>
+          <br />
+          <span style={{ color: "#ffffff" }}>neighbourhood</span>
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+      <div
+        className="grid grid-cols-1 md:grid-cols-3"
+        style={{
+          border: "1px dashed rgba(255,255,255,0.07)",
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      >
         {testimonials.map((t, i) => (
-          <TestimonialCard key={i} t={t} index={i} />
+          <TestCard key={i} t={t} index={i} total={testimonials.length} />
         ))}
       </div>
     </section>
   );
 }
 
-function TestimonialCard({
+function TestCard({
   t,
   index,
+  total,
 }: {
   t: (typeof testimonials)[0];
   index: number;
+  total: number;
 }) {
   const { ref, visible } = useReveal();
 
   return (
     <div
       ref={ref}
-      className={`bg-warm px-11 py-11 rounded-lg border-t-2 border-sand transition-all duration-700 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_rgba(46,59,47,0.1)]
-        ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-      style={{ transitionDelay: `${index * 0.12}s` }}
+      className={`relative p-9 transition-all duration-700 ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      }`}
+      style={{
+        background: "#0C0C0E",
+        transitionDelay: `${index * 0.1}s`,
+        borderRight:
+          index < total - 1 ? "1px dashed rgba(255,255,255,0.07)" : "none",
+      }}
     >
-      <p className="font-cormorant text-[20px] italic leading-[1.6] text-moss mb-7">
+      <div
+        className="mb-5 leading-none select-none"
+        style={{
+          fontSize: "40px",
+          color: "rgba(255,255,255,0.10)",
+          fontFamily: "var(--font-display)",
+        }}
+      >
+        &ldquo;
+      </div>
+      <p
+        className="leading-[1.75] mb-8"
+        style={{
+          fontSize: "14px",
+          color: "rgba(255,255,255,0.48)",
+          fontFamily: "var(--font-display)",
+          fontWeight: 400,
+        }}
+      >
         {t.text}
       </p>
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-3">
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center font-cormorant text-[16px] text-white font-semibold"
-          style={{ background: t.color }}
+          className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[13px] font-medium shrink-0"
+          style={{ background: `linear-gradient(135deg,${t.g1},${t.g2})` }}
         >
           {t.initial}
         </div>
-        <div className="text-[13px]">
-          <div className="text-moss font-medium mb-0.5">{t.name}</div>
-          <div className="text-sand text-[12px]">{t.loc}</div>
+        <div>
+          <div
+            className="text-[13px] font-medium"
+            style={{ color: "rgba(255,255,255,0.70)" }}
+          >
+            {t.name}
+          </div>
+          <div
+            className="text-[11px]"
+            style={{ color: "rgba(255,255,255,0.26)" }}
+          >
+            {t.loc}
+          </div>
         </div>
       </div>
     </div>
